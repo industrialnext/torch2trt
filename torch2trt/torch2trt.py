@@ -782,7 +782,10 @@ def torch2trt(module,
             ctx.mark_outputs(outputs_flat, output_names)
 
     # set max workspace size
-    config.max_workspace_size = max_workspace_size
+    if trt_version() >= "8.4":
+        config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, max_workspace_size)
+    else:
+        config.max_workspace_size = max_workspace_size
 
     # set number of avg timing itrs.
     if avg_timing_iterations is not None:
